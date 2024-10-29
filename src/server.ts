@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
 
 import { meetingRoutes } from './routes/meeting.routes.js';
@@ -24,6 +24,18 @@ app.get('/', (req, res) => {
 app.use('/api/meetings', authMiddleware, meetingRoutes);
 app.use('/api/tasks', authMiddleware, taskRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
+
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  console.log('Something went wrong', err);
+
+  res.status(500).json({
+    message: err?.message ?? 'Internal Server Error',
+  });
+
+  return;
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
