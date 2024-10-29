@@ -34,6 +34,29 @@ export const getMeetingsByUserId = async (
   }
 };
 
+export const createMeeting = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { title, date, participants } = req.body;
+    const userId = (req as AuthenticatedRequest).userId;
+
+    const meetings = await meetingServices.createMeeting({
+      userId,
+      title,
+      date,
+      participants,
+    });
+
+    res.status(200).json(meetings);
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
 // TODO: implement other endpoints
 
 export const getStats = async (req: AuthenticatedRequest, res: Response) => {

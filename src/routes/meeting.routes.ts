@@ -5,6 +5,7 @@ const router = express.Router();
 
 // GET all meetings for user
 router.get('/', meetingController.getMeetingsByUserId);
+router.post('/', meetingController.createMeeting);
 
 // TODO: implement other endpoints
 // router.get('/stats', meetingController.getStats);

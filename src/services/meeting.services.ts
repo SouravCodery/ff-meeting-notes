@@ -32,3 +32,23 @@ export const getMeetingsByUserId = async ({
 
   return data;
 };
+
+export const createMeeting = async ({
+  userId,
+  title,
+  date,
+  participants,
+}: {
+  userId: string;
+  title: string;
+  date: Date;
+  participants: string[];
+}) => {
+  const newMeeting = new Meeting({
+    title,
+    date,
+    participants,
+  });
+
+  return await newMeeting.save();
+};
