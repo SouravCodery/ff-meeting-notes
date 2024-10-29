@@ -45,10 +45,21 @@ export const createMeeting = async ({
   participants: string[];
 }) => {
   const newMeeting = new Meeting({
+    userId,
     title,
     date,
     participants,
   });
 
   return await newMeeting.save();
+};
+
+export const getMeetingById = async ({
+  userId,
+  meetingId,
+}: {
+  userId: string;
+  meetingId: string;
+}) => {
+  return await Meeting.findOne({ _id: meetingId, userId }).lean();
 };
