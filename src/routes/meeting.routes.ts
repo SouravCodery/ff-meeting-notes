@@ -13,8 +13,6 @@ router.post(
   '/:meetingId/summarize',
   meetingController.generateSummaryAndActionItems
 );
-
-// TODO: implement other endpoints
-// router.get('/stats', meetingController.getStats);
+router.get('/stats', meetingController.getStats);
 
 export { router as meetingRoutes };

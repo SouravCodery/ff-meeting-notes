@@ -122,3 +122,80 @@ export const generateSummaryAndActionItems = async ({
     tasks,
   };
 };
+
+//though the aggregation pipeline runs correctly in atlas it's giving an error here
+export const getStats = async () => {
+  const [totalMeetings, participants, dayOfWeek] = await Promise.all([
+    Meeting.countDocuments(),
+    Meeting.aggregate([
+      {
+        $project:
+          /**
+           * specifications: The fields to
+           *   include or exclude.
+           */
+          {
+            participants: 1,
+          },
+      },
+      {
+        $unwind: {
+          path: '$participants',
+          includeArrayIndex: 'string',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$participants',
+          meetingCount: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $sort: {
+          meetingCount: -1,
+        },
+      },
+    ]),
+    Meeting.aggregate([
+      {
+        $group: {
+          _id: {
+            $dayOfWeek: '$date',
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+    ]),
+  ]);
+
+  let totalParticipants = 0;
+
+  const topParticipants = participants.map((participant) => {
+    totalParticipants += participant.meetingCount;
+
+    return {
+      participant: participant._id.toString(),
+      meetingCount: participant.meetingCount,
+    };
+  });
+
+  const stats = {
+    generalStats: {
+      totalMeetings: totalMeetings,
+      averageParticipants: totalParticipants / totalMeetings,
+      totalParticipants: totalParticipants,
+      shortestMeeting: 15,
+      longestMeeting: 120,
+      averageDuration: 45.3,
+    },
+    topParticipants: topParticipants.splice(0, 5),
+    meetingsByDayOfWeek: dayOfWeek,
+  };
+
+  return stats;
+};
