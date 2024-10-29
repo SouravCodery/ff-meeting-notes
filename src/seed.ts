@@ -5,7 +5,7 @@ import { Task } from './models/task.model.js';
 import { IMeeting } from './interfaces/meeting.interfaces.js';
 import { ITask } from './interfaces/task.interfaces.js';
 
-const MONGODB_URI = 'mongodb://localhost:27017/meetingbot';
+const MONGODB_URI = 'mongodb://host.docker.internal:27017/meetingbot';
 
 await mongoose
   .connect(MONGODB_URI)
