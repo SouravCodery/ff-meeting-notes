@@ -50,7 +50,7 @@ export const createMeeting = async (
       participants,
     });
 
-    res.status(200).json(meetings);
+    res.status(201).json(meetings);
     return;
   } catch (err) {
     return next(err);
@@ -70,6 +70,30 @@ export const getMeetingById = async (
     const meeting = await meetingServices.getMeetingById({
       userId,
       meetingId,
+    });
+
+    res.status(200).json(meeting);
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const updateMeetingTranscript = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as AuthenticatedRequest).userId;
+    const { meetingId } = req.params;
+    const { transcript } = req.body;
+
+    //using userId as well to make sure the user is authorized to update the meeting transcript
+    const meeting = await meetingServices.updateMeetingTranscript({
+      userId,
+      meetingId,
+      transcript,
     });
 
     res.status(200).json(meeting);

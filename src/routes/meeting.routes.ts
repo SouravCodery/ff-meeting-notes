@@ -7,6 +7,8 @@ const router = express.Router();
 router.get('/', meetingController.getMeetingsByUserId);
 router.post('/', meetingController.createMeeting);
 router.get('/:meetingId', meetingController.getMeetingById);
+//Ideally it should be patch request
+router.put('/:meetingId/transcript', meetingController.updateMeetingTranscript);
 
 // TODO: implement other endpoints
 // router.get('/stats', meetingController.getStats);

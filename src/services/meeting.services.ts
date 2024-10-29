@@ -63,3 +63,22 @@ export const getMeetingById = async ({
 }) => {
   return await Meeting.findOne({ _id: meetingId, userId }).lean();
 };
+
+export const updateMeetingTranscript = async ({
+  userId,
+  meetingId,
+  transcript,
+}: {
+  userId: string;
+  meetingId: string;
+  transcript: string;
+}) => {
+  const meeting = await Meeting.findOne({ _id: meetingId, userId });
+
+  if (!meeting) {
+    throw new Error('Meeting not found');
+  }
+
+  meeting.transcript = transcript;
+  return await meeting.save();
+};
