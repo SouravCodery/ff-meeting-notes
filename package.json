@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node --import=tsx src/server.ts",
+    "dev": "nodemon --watch src --exec tsx src/server.ts",
     "seed": "node --import=tsx src/seed.ts"
   },
   "keywords": [],
