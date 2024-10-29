@@ -3,6 +3,6 @@ import * as taskController from '../controllers/task.controllers';
 
 export const router = express.Router();
 
-router.get('/', taskController.getTasks);
+router.get('/', taskController.getTasksByUserId);
 
 export { router as taskRoutes };

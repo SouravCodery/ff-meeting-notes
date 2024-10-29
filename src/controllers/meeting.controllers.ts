@@ -1,55 +1,143 @@
-import express, { Response } from 'express';
-import { Meeting } from '../models/meeting.js';
+import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../auth.middleware.js';
 
+import * as meetingServices from '../services/meeting.services';
+import { Config } from '../config/config.js';
+import { getTasksByMeetingId } from '../services/task.services.js';
+
 // GET all meetings for user
-export const getMeetings = async (req: AuthenticatedRequest, res: Response) => {
+export const getMeetingsByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const meetings = await Meeting.find();
-    res.json({
-      total: meetings.length,
-      limit: req.query.limit,
-      page: req.query.page,
-      data: meetings,
+    const userId = (req as AuthenticatedRequest).userId;
+
+    const limit = req.query.limit
+      ? parseInt(req.query.limit as string)
+      : Config.PAGINATION_LIMIT;
+
+    const page = req.query.page
+      ? parseInt(req.query.page as string)
+      : Config.DEFAULT_PAGE;
+
+    const meetings = await meetingServices.getMeetingsByUserId({
+      userId,
+      limit,
+      page,
     });
+
+    res.status(200).json(meetings);
+    return;
   } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
+    return next(err);
   }
 };
 
-// TODO: implement other endpoints
-
-export const getStats = async (req: AuthenticatedRequest, res: Response) => {
+export const createMeeting = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    // TODO: get statistics from the database
-    const stats = {
-      generalStats: {
-        totalMeetings: 100,
-        averageParticipants: 4.75,
-        totalParticipants: 475,
-        shortestMeeting: 15,
-        longestMeeting: 120,
-        averageDuration: 45.3,
-      },
-      topParticipants: [
-        { participant: 'John Doe', meetingCount: 20 },
-        { participant: 'Jane Smith', meetingCount: 18 },
-        { participant: 'Bob Johnson', meetingCount: 15 },
-        { participant: 'Alice Brown', meetingCount: 12 },
-        { participant: 'Charlie Davis', meetingCount: 10 },
-      ],
-      meetingsByDayOfWeek: [
-        { dayOfWeek: 1, count: 10 },
-        { dayOfWeek: 2, count: 22 },
-        { dayOfWeek: 3, count: 25 },
-        { dayOfWeek: 4, count: 20 },
-        { dayOfWeek: 5, count: 18 },
-        { dayOfWeek: 6, count: 5 },
-        { dayOfWeek: 7, count: 0 },
-      ],
-    };
-    res.json(stats);
+    const { title, date, participants } = req.body;
+    const userId = (req as AuthenticatedRequest).userId;
+
+    const meetings = await meetingServices.createMeeting({
+      userId,
+      title,
+      date,
+      participants,
+    });
+
+    res.status(201).json(meetings);
+    return;
   } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
+    return next(err);
+  }
+};
+
+export const getMeetingById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as AuthenticatedRequest).userId;
+    const { meetingId } = req.params;
+
+    //using userId as well to make sure the user is authorized to access the meeting
+    const meeting = await meetingServices.getMeetingById({
+      userId,
+      meetingId,
+    });
+
+    const tasks = await getTasksByMeetingId({
+      userId,
+      meetingId,
+    });
+
+    res.status(200).json({ meeting, tasks });
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const updateMeetingTranscript = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as AuthenticatedRequest).userId;
+    const { meetingId } = req.params;
+    const { transcript } = req.body;
+
+    //using userId as well to make sure the user is authorized to update the meeting transcript
+    const meeting = await meetingServices.updateMeetingTranscript({
+      userId,
+      meetingId,
+      transcript,
+    });
+
+    res.status(200).json(meeting);
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const generateSummaryAndActionItems = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { meetingId } = req.params;
+
+    const meeting = await meetingServices.generateSummaryAndActionItems({
+      meetingId,
+    });
+
+    res.status(200).json(meeting);
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const getStats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const stats = await meetingServices.getStats();
+    res.json(stats);
+    return;
+  } catch (err) {
+    return next(err);
   }
 };

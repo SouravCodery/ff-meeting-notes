@@ -1,19 +1,21 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
 export interface AuthenticatedRequest extends Request {
-  userId?: string;
+  userId: string;
 }
 
 export const authMiddleware = (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const userId = req.header("x-user-id");
+  const userId = req.header('x-user-id');
+
   if (!userId) {
-    res.status(401).json({ message: "Authentication required" });
+    res.status(401).json({ message: 'Authentication required' });
     return;
   }
-  req.userId = userId;
+
+  (req as AuthenticatedRequest).userId = userId;
   next();
 };

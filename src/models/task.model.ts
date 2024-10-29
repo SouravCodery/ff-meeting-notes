@@ -2,8 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 import { ITask } from '../interfaces/task.interfaces';
 
 const taskSchema = new Schema<ITask>({
-  meetingId: { type: Schema.Types.ObjectId, ref: 'Meeting' },
-  userId: String,
+  meetingId: { type: Schema.Types.ObjectId, ref: 'Meeting', required: true },
+  userId: { type: String, required: true },
   title: String,
   description: String,
   status: {
