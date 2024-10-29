@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../auth.middleware.js';
 
 import * as meetingServices from '../services/meeting.services';
 import { Config } from '../config/config.js';
+import { getTasksByMeetingId } from '../services/task.services.js';
 
 // GET all meetings for user
 export const getMeetingsByUserId = async (
@@ -72,7 +73,12 @@ export const getMeetingById = async (
       meetingId,
     });
 
-    res.status(200).json(meeting);
+    const tasks = await getTasksByMeetingId({
+      userId,
+      meetingId,
+    });
+
+    res.status(200).json({ meeting, tasks });
     return;
   } catch (err) {
     return next(err);

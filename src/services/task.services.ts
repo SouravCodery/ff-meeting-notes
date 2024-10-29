@@ -28,3 +28,13 @@ export const createTasks = async ({
 
   return await Task.insertMany(tasks);
 };
+
+export const getTasksByMeetingId = async ({
+  userId,
+  meetingId,
+}: {
+  userId: string;
+  meetingId: string;
+}) => {
+  return await Task.find({ _id: meetingId, userId }).lean();
+};
