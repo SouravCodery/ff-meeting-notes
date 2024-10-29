@@ -1,19 +1,36 @@
-import express, { Response } from 'express';
-import { Meeting } from '../models/meeting.js';
+import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../auth.middleware.js';
 
+import * as meetingServices from '../services/meeting.services';
+import { Config } from '../config/config.js';
+
 // GET all meetings for user
-export const getMeetings = async (req: AuthenticatedRequest, res: Response) => {
+export const getMeetingsByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const meetings = await Meeting.find();
-    res.json({
-      total: meetings.length,
-      limit: req.query.limit,
-      page: req.query.page,
-      data: meetings,
+    const userId = (req as AuthenticatedRequest).userId;
+
+    const limit = req.query.limit
+      ? parseInt(req.query.limit as string)
+      : Config.PAGINATION_LIMIT;
+
+    const page = req.query.page
+      ? parseInt(req.query.page as string)
+      : Config.DEFAULT_PAGE;
+
+    const meetings = await meetingServices.getMeetingsByUserId({
+      userId,
+      limit,
+      page,
     });
+
+    res.status(200).json(meetings);
+    return;
   } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
+    return next(err);
   }
 };
 
@@ -49,6 +66,7 @@ export const getStats = async (req: AuthenticatedRequest, res: Response) => {
       ],
     };
     res.json(stats);
+    return;
   } catch (err) {
     res.status(500).json({ message: (err as Error).message });
   }
