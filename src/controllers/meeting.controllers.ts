@@ -135,7 +135,7 @@ export const getStats = async (
 ) => {
   try {
     const stats = await meetingServices.getStats();
-    res.json(stats);
+    res.status(200).json(stats);
     return;
   } catch (err) {
     return next(err);
