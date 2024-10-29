@@ -9,6 +9,10 @@ router.post('/', meetingController.createMeeting);
 router.get('/:meetingId', meetingController.getMeetingById);
 //Ideally it should be patch request
 router.put('/:meetingId/transcript', meetingController.updateMeetingTranscript);
+router.post(
+  '/:meetingId/summarize',
+  meetingController.generateSummaryAndActionItems
+);
 
 // TODO: implement other endpoints
 // router.get('/stats', meetingController.getStats);

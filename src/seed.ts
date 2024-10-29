@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Meeting } from './models/meeting.model.js';
-import { Task } from './models/task.js';
+import { Task } from './models/task.model.js';
 
 import { IMeeting } from './interfaces/meeting.interfaces.js';
 import { ITask } from './interfaces/task.interfaces.js';

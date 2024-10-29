@@ -1,5 +1,8 @@
+import { Mongoose, Types } from 'mongoose';
 import { Config } from '../config/config';
 import { Meeting } from '../models/meeting.model';
+import { generateSummaryAndActionItemsUsingAI } from './bot.services';
+import { createTasks } from './task.services';
 
 export const getMeetingsByUserId = async ({
   userId,
@@ -81,4 +84,41 @@ export const updateMeetingTranscript = async ({
 
   meeting.transcript = transcript;
   return await meeting.save();
+};
+
+export const generateSummaryAndActionItems = async ({
+  meetingId,
+}: {
+  meetingId: string;
+}) => {
+  const meeting = await Meeting.findOne({ _id: meetingId });
+
+  if (!meeting) {
+    throw new Error('Meeting not found');
+  }
+
+  if (meeting.summary) {
+    throw new Error('Summary already generated');
+  }
+
+  const summaryAndActionItems = await generateSummaryAndActionItemsUsingAI({
+    meetingId: (meeting._id as Types.ObjectId).toString(),
+  });
+
+  meeting.summary = summaryAndActionItems.summary;
+  meeting.actionItems = summaryAndActionItems.actionItems;
+
+  const tasks = await createTasks({
+    meetingId: (meeting._id as Types.ObjectId).toString(),
+    userId: meeting.userId,
+    actionItems: summaryAndActionItems.actionItems,
+  });
+
+  //Making sure tasks are created before saving the meeting
+  await meeting.save();
+
+  return {
+    meeting,
+    tasks,
+  };
 };

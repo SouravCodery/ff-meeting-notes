@@ -103,6 +103,25 @@ export const updateMeetingTranscript = async (
   }
 };
 
+export const generateSummaryAndActionItems = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { meetingId } = req.params;
+
+    const meeting = await meetingServices.generateSummaryAndActionItems({
+      meetingId,
+    });
+
+    res.status(200).json(meeting);
+    return;
+  } catch (err) {
+    return next(err);
+  }
+};
+
 // TODO: implement other endpoints
 
 export const getStats = async (req: AuthenticatedRequest, res: Response) => {
