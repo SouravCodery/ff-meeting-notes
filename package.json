@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --import=tsx src/server.ts",
     "dev": "nodemon --watch src --exec tsx src/server.ts",
-    "seed": "node --import=tsx src/seed.ts"
+    "seed": "node --import=tsx src/seed.ts",
+    "docker:build": "docker build -t fireflies-backend-test .",
+    "docker:run": "docker run -d -p 3000:3000 fireflies-backend-test"
   },
   "keywords": [],
   "author": "",
