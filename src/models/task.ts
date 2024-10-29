@@ -1,13 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
-export interface ITask extends Document {
-  meetingId: mongoose.Types.ObjectId;
-  userId: string;
-  title: string;
-  description: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  dueDate: Date;
-}
+import mongoose, { Schema } from 'mongoose';
+import { ITask } from '../interfaces/task.interfaces';
 
 const taskSchema = new Schema<ITask>({
   meetingId: { type: Schema.Types.ObjectId, ref: 'Meeting' },
@@ -17,9 +9,9 @@ const taskSchema = new Schema<ITask>({
   status: {
     type: String,
     enum: ['pending', 'in-progress', 'completed'],
-    default: 'pending'
+    default: 'pending',
   },
-  dueDate: Date
+  dueDate: Date,
 });
 
 export const Task = mongoose.model<ITask>('Task', taskSchema);

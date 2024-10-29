@@ -1,11 +1,9 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { Meeting } from '../models/meeting.js';
 import { AuthenticatedRequest } from '../auth.middleware.js';
 
-export const router = express.Router();
-
 // GET all meetings for user
-router.get('/', async (req: AuthenticatedRequest, res) => {
+export const getMeetings = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const meetings = await Meeting.find();
     res.json({
@@ -17,11 +15,11 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
   } catch (err) {
     res.status(500).json({ message: (err as Error).message });
   }
-});
+};
 
 // TODO: implement other endpoints
 
-router.get('/stats', async (req: AuthenticatedRequest, res) => {
+export const getStats = async (req: AuthenticatedRequest, res: Response) => {
   try {
     // TODO: get statistics from the database
     const stats = {
@@ -34,11 +32,11 @@ router.get('/stats', async (req: AuthenticatedRequest, res) => {
         averageDuration: 45.3,
       },
       topParticipants: [
-        { participant: "John Doe", meetingCount: 20 },
-        { participant: "Jane Smith", meetingCount: 18 },
-        { participant: "Bob Johnson", meetingCount: 15 },
-        { participant: "Alice Brown", meetingCount: 12 },
-        { participant: "Charlie Davis", meetingCount: 10 },
+        { participant: 'John Doe', meetingCount: 20 },
+        { participant: 'Jane Smith', meetingCount: 18 },
+        { participant: 'Bob Johnson', meetingCount: 15 },
+        { participant: 'Alice Brown', meetingCount: 12 },
+        { participant: 'Charlie Davis', meetingCount: 10 },
       ],
       meetingsByDayOfWeek: [
         { dayOfWeek: 1, count: 10 },
@@ -54,6 +52,4 @@ router.get('/stats', async (req: AuthenticatedRequest, res) => {
   } catch (err) {
     res.status(500).json({ message: (err as Error).message });
   }
-});
-
-export { router as meetingRoutes };
+};
